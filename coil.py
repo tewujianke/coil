@@ -12,7 +12,7 @@ import os
 import sys
 from enum import Enum
 import threading
-
+import ctypes
 class guns(Enum):
     EMPTY = 0
     SCAR = 1
@@ -24,12 +24,10 @@ class guns(Enum):
 
 class Gun(object):
 
-    def __init__(self,gun_id,recoil_seq,rounds_per_min):
+    def __init__(self,gun_id,recoil_seq,time_between_shots):
         scalar = 0.2
         self.gun_id = gun_id
         self.recoil_seq = [int(x*scalar) for x in recoil_seq]
-        self.rounds_per_min = rounds_per_min
-
         self.time_between_shots = time_between_shots
 
     def get_recoil(self):
@@ -39,8 +37,8 @@ class Uzi(Gun):
 
     def __init__(self):
         recoil = [137,75,75,75,75,75,75,75,75,75,75,75,75]
-        fire_spd = 600
-        Gun.__init__(self,guns.UZI,recoil,fire_spd)
+        time_between_shot = 0.048 #per pubg.me
+        Gun.__init__(self,guns.UZI,recoil,time_between_shot)
     
 class aid(object):
 
@@ -59,7 +57,7 @@ class menu_thread(threading.Thread):
     def run(self):
         while 1:
             a = win32api.GetAsyncKeyState(win32con.VK_NUMPAD7)
-            if a:
+            if a: #activation num pad 7
                 #a = win32api.GetAsyncKeyState(win32con.VK_NUMPAD7)
                 while a:
                     a = win32api.GetAsyncKeyState(win32con.VK_NUMPAD7)
@@ -92,7 +90,8 @@ if __name__ == '__main__':
             time.sleep(current_gun.time_between_shots)
             (curx,cury) = win32api.GetCursorPos()
             y = cury+current_gun.get_recoil()[count]
-            win32api.SetCursorPos((curx,y))
+            #win32api.SetCursorPos((curx,y))
+            ctypes.windll.user32.SetCursorPos(curx,y)
             count+=1
             if count == len(current_gun.get_recoil()):
                 count = 0
