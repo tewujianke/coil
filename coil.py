@@ -30,7 +30,7 @@ class Gun(object):
         self.recoil_seq = [int(x*scalar) for x in recoil_seq]
         self.rounds_per_min = rounds_per_min
 
-        self.time_between_shots = 1.0/((rounds_per_min+2)/60)
+        self.time_between_shots = time_between_shots
 
     def get_recoil(self):
         return self.recoil_seq
@@ -47,6 +47,9 @@ class aid(object):
     def __init__(self):
         self.current_gun = guns.EMPTY
 
+"""
+Multithreading for user's keyboard control
+"""        
 class menu_thread(threading.Thread):
 
     def __init__(self):
