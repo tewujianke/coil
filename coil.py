@@ -46,17 +46,46 @@ class aid(object):
 
     def __init__(self):
         self.current_gun = guns.EMPTY
+
+class menu_thread(threading.Thread):
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.activate = 0
         
+    def run(self):
+        while 1:
+            a = win32api.GetAsyncKeyState(win32con.VK_NUMPAD7)
+            if a:
+                #a = win32api.GetAsyncKeyState(win32con.VK_NUMPAD7)
+                while a:
+                    a = win32api.GetAsyncKeyState(win32con.VK_NUMPAD7)
+                self.activate = ~self.activate
+                print("activate=%d"%self.activate)
+                if self.activate:
+                    print("\a")
+            
+            
+    def is_activate(self):
+        if self.activate:
+            return True
+        else:
+            return False
 
+        
 if __name__ == '__main__':
+    activate = 0
 
+    t = menu_thread()
+    t.start()
+    
     a = Uzi()
     print(a.get_recoil())
     current_gun = Uzi()
     count = 0
     while 1:
         a = win32api.GetAsyncKeyState(win32con.VK_LBUTTON)
-        while a != 0:
+        while a != 0 and t.is_activate():
             time.sleep(current_gun.time_between_shots)
             (curx,cury) = win32api.GetCursorPos()
             y = cury+current_gun.get_recoil()[count]
